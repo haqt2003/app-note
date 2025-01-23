@@ -128,22 +128,41 @@ class MainActivity : AppCompatActivity(), NoteAdapter.OnAdapterListener {
             etSearch.addTextChangedListener {
                 val searchQuery = binding.etSearch.text.toString()
 
-                val searchList = if (searchQuery.isEmpty()) {
-                    val tmpItems = mutableListOf<Note>()
-                    tmpItems.addAll(notes)
-                    tmpItems
+                if (searchQuery.isEmpty()) {
+                    adapter.updateNotes(notes)
+                    tvOk.setOnClickListener {
+                        when (rgSort.checkedRadioButtonId) {
+                            R.id.rb_newest -> notes.sortByDescending { it.editTime }
+                            R.id.rb_oldest -> notes.sortBy { it.editTime }
+                            R.id.rb_az -> notes.sortBy { it.title }
+                            R.id.rb_za -> notes.sortByDescending { it.title }
+                        }
+                        adapter.notifyDataSetChanged()
+                        clSort.visibility = View.GONE
+                        vBlur.visibility = View.GONE
+                    }
                 } else {
                     val tmpItems = mutableListOf<Note>()
                     tmpItems.addAll(notes)
-                    tmpItems.filter {
+                    val queryItem = tmpItems.filter {
                         it.title.contains(searchQuery, ignoreCase = true) || it.content.contains(
                             searchQuery,
                             ignoreCase = true
                         )
                     }.toMutableList()
+                    adapter.updateNotes(queryItem)
+                    tvOk.setOnClickListener {
+                        when (rgSort.checkedRadioButtonId) {
+                            R.id.rb_newest -> queryItem.sortByDescending { it.editTime }
+                            R.id.rb_oldest -> queryItem.sortBy { it.editTime }
+                            R.id.rb_az -> queryItem.sortBy { it.title }
+                            R.id.rb_za -> queryItem.sortByDescending { it.title }
+                        }
+                        adapter.notifyDataSetChanged()
+                        clSort.visibility = View.GONE
+                        vBlur.visibility = View.GONE
+                    }
                 }
-
-                adapter.updateNotes(searchList)
             }
 
             vBlur.setOnClickListener {

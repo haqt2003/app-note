@@ -43,11 +43,10 @@ class EditActivity : AppCompatActivity() {
         val note = intent.getParcelableExtra<Note>("note")
 
         with(binding) {
-            tvTime.text = formatDate(System.currentTimeMillis())
-
             note?.let {
                 etTitle.setText(it.title)
                 etContent.setText(it.content)
+                tvTime.text = formatDate(it.editTime)
             }
 
             btBack.setOnClickListener {
